@@ -41,7 +41,6 @@ class BreadthFirstSearch:
             # Remove a node from the frontier
             node = frontier.remove()
 
-            # Go right
             successors = grid.get_neighbours(node.state)
             
             for action in successors: 
