@@ -44,6 +44,7 @@ class DepthFirstSearch:
             # Go right
             successors = grid.get_neighbours(node.state)
             
+            explored[node.state] = True
             for action in successors: 
 
                 # Get the successor
@@ -58,7 +59,6 @@ class DepthFirstSearch:
                                     parent=node, action=action)
 
                     # Mark the successor as reached
-                    explored[new_state] = True
 
                     # Return if the node contains a goal state
                     # In this example, the goal test is run
