@@ -18,8 +18,10 @@ class GreedyBestFirstSearch:
         node = Node("", state=grid.start, cost=0, parent=None, action=None)
 
         def h(node):
+
             return (int(((grid.end[0]-node.state[0])**2 + (grid.end[1]-node.state[1])**2)**(1/2)))
-             
+            #return (abs(grid.end[0]-node.state[0]) + (abs(grid.end[1]-node.state[1])))
+
             
         
         frontier = PriorityQueueFrontier()
