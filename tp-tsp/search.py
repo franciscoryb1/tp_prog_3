@@ -17,8 +17,7 @@ No viene implementado, se debe completar.
 
 
 from __future__ import annotations
-from problem import OptProblem
-from node import Node
+from problem import OptProblem, TSP
 from random import choice
 from time import time
 
@@ -57,43 +56,98 @@ class HillClimbing(LocalSearch):
         # Inicio del reloj
         start = time()
 
-        # Crear el nodo inicial
-        actual = Node(problem.init, problem.obj_val(problem.init))
+        # Arrancamos del estado inicial
+        actual = problem.init
+        value = problem.obj_val(problem.init)
 
         while True:
 
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
-            diff = problem.val_diff(actual.state)
+            diff = problem.val_diff(actual)
 
-            # Buscar las acciones que generan el  mayor incremento de valor obj
+            # Buscar las acciones que generan el mayor incremento de valor obj
             max_acts = [act for act, val in diff.items() if val ==
                         max(diff.values())]
 
             # Elegir una accion aleatoria
             act = choice(max_acts)
 
-            # Retornar si estamos en un optimo local
+            # Retornar si estamos en un optimo local 
+            # (diferencia de valor objetivo no positiva)
             if diff[act] <= 0:
 
-                self.tour = actual.state
-                self.value = actual.value
+                self.tour = actual
+                self.value = value
                 end = time()
                 self.time = end-start
                 return
 
-            # Sino, moverse a un nodo con el estado sucesor
+            # Sino, nos movemos al sucesor
             else:
 
-                actual = Node(problem.result(actual.state, act),
-                              actual.value + diff[act])
+                actual = problem.result(actual, act)
+                value = value + diff[act]
                 self.niters += 1
 
 
 class HillClimbingReset(LocalSearch):
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
 
-    # COMPLETAR
+    def solve(self, problem: OptProblem):
+        """Resuelve un problema de optimizacion con ascension de colinas.
+
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimizacion
+        """
+        # Inicio del reloj
+        start = time()
+
+        # Arrancamos del estado inicial
+        actual = problem.init
+        value = problem.obj_val(problem.init)
+
+        limit = 100
+        count = 0
+            
+        while True:
+
+            # Determinar las acciones que se pueden aplicar
+            # y las diferencias en valor objetivo que resultan
+            diff = problem.val_diff(actual)
+
+            # Buscar las acciones que generan el mayor incremento de valor obj
+            max_acts = [act for act, val in diff.items() if val ==
+                        max(diff.values())]
+
+            # Elegir una accion aleatoria
+            act = choice(max_acts)
+
+            # Retornar si estamos en un optimo local 
+            # (diferencia de valor objetivo no positiva)
+            if diff[act] <= 0:
+
+                if count == limit:
+                    self.tour = actual
+                    self.value = value
+                    end = time()
+                    self.time = end-start
+                    return
+
+                else:
+                    
+                    actual = problem.random_reset()
+                    value = value + diff[act]
+                    count += 1
+                    
+            # Sino, nos movemos al sucesor
+            else:
+
+                actual = problem.result(actual, act)
+                value = problem.obj_val(actual)
+                self.niters += 1
 
 
 class Tabu(LocalSearch):
