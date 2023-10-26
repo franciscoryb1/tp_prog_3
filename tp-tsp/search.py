@@ -94,7 +94,7 @@ class HillClimbing(LocalSearch):
 class HillClimbingReset(LocalSearch):
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
 
-    def solve(self, problem: OptProblem):
+    def solve(self, problem: TSP):
         """Resuelve un problema de optimizacion con ascension de colinas.
 
         Argumentos:
@@ -109,7 +109,7 @@ class HillClimbingReset(LocalSearch):
         actual = problem.init
         value = problem.obj_val(problem.init)
 
-        limit = 100
+        limit = 10
         count = 0
             
         while True:
@@ -137,9 +137,8 @@ class HillClimbingReset(LocalSearch):
                     return
 
                 else:
-                    
                     actual = problem.random_reset()
-                    value = value + diff[act]
+                    value = problem.obj_val(actual)
                     count += 1
                     
             # Sino, nos movemos al sucesor
@@ -153,4 +152,44 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
 
-    # COMPLETAR
+    def solve(self, problem: OptProblem):
+        actual = problem.init
+        mejor = actual
+        value_mejor = problem.obj_val(mejor)
+        tabu = []
+        start = time()
+        
+        while self.niters <= 1000:
+            sucesores = problem.val_diff(actual)
+            # no_tabues = [s for s in sucesor if s not in tabu]
+            no_tabues = {}
+            for k, v in sucesores:
+                if k not in tabu:
+                    no_tabues[k] = v
+            sucesor = [act for act, val in no_tabues.items() if val == max(sucesores.values())]
+            
+            act = choice(sucesor)
+            
+            actual = problem.result(actual, act)
+            value = problem.obj_val(actual)
+                
+            if value_mejor < value:
+                mejor = actual
+                value_mejor = problem.obj_val(mejor)
+                
+                if len(tabu) == 20:
+                    tabu.pop(0) 
+                    tabu.append(act)
+                else:
+                    tabu.append(act)
+            self.niters += 1
+            
+        self.tour = mejor
+        self.value = value_mejor
+        end = time()
+        self.time = end-start
+        return mejor
+
+
+# class Tabu(LocalSearch):
+#     """Algoritmo de busqueda tabu."""
