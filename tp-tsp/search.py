@@ -14,8 +14,6 @@ No viene implementado, se debe completar.
 * Tabu: algoritmo de busqueda tabu.
 No viene implementado, se debe completar.
 """
-
-
 from __future__ import annotations
 from problem import OptProblem, TSP
 from random import choice
@@ -113,7 +111,6 @@ class HillClimbingReset(LocalSearch):
         count = 0
             
         while True:
-
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
             diff = problem.val_diff(actual)
@@ -128,7 +125,6 @@ class HillClimbingReset(LocalSearch):
             # Retornar si estamos en un optimo local 
             # (diferencia de valor objetivo no positiva)
             if diff[act] <= 0:
-
                 if count == limit:
                     self.tour = actual
                     self.value = value
@@ -136,15 +132,13 @@ class HillClimbingReset(LocalSearch):
                     self.time = end-start
                     return
 
-                else:
-                    
+                else:   
                     actual = problem.random_reset()
                     value = value + diff[act]
                     count += 1
                     
             # Sino, nos movemos al sucesor
             else:
-
                 actual = problem.result(actual, act)
                 value = problem.obj_val(actual)
                 self.niters += 1
@@ -153,4 +147,25 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
 
-    # COMPLETAR
+    def solve(self, problem: OptProblem):
+        actual = problem.init
+        mejor = actual
+        tabu = []
+            
+        while problem.val_diff(mejor) > 0:
+            sucesores = problem.val_diff(actual)
+            no_tabues = [s for s in sucesores if s not in tabu]
+            sucesor = [act for act, val in sucesores.items() if val == max(sucesores.values()) and act in no_tabues]
+            act = choice(sucesor)
+            
+            if sucesores[mejor] < sucesores[act]:
+                mejor = act
+                if len(tabu) == 24:
+                    tabu.pop(0) 
+                    tabu.append(act)
+                else:
+                    tabu.append(act)
+                actual = act
+            
+        return mejor
+                
