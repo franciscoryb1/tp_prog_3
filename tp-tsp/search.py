@@ -14,8 +14,6 @@ No viene implementado, se debe completar.
 * Tabu: algoritmo de busqueda tabu.
 No viene implementado, se debe completar.
 """
-
-
 from __future__ import annotations
 from problem import OptProblem, TSP
 from random import choice
@@ -113,7 +111,6 @@ class HillClimbingReset(LocalSearch):
         count = 0
             
         while True:
-
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
             diff = problem.val_diff(actual)
@@ -128,7 +125,6 @@ class HillClimbingReset(LocalSearch):
             # Retornar si estamos en un optimo local 
             # (diferencia de valor objetivo no positiva)
             if diff[act] <= 0:
-
                 if count == limit:
                     self.tour = actual
                     self.value = value
@@ -143,7 +139,6 @@ class HillClimbingReset(LocalSearch):
                     
             # Sino, nos movemos al sucesor
             else:
-
                 actual = problem.result(actual, act)
                 value = problem.obj_val(actual)
                 self.niters += 1
@@ -163,10 +158,10 @@ class Tabu(LocalSearch):
             sucesores = problem.val_diff(actual)
             # no_tabues = [s for s in sucesor if s not in tabu]
             no_tabues = {}
-            for k, v in sucesores:
+            for k, v in sucesores.items():
                 if k not in tabu:
                     no_tabues[k] = v
-            sucesor = [act for act, val in no_tabues.items() if val == max(sucesores.values())]
+            sucesor = [act for act, val in no_tabues.items() if val == max(no_tabues.values())]
             
             act = choice(sucesor)
             
