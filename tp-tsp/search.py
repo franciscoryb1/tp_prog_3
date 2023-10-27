@@ -109,7 +109,7 @@ class HillClimbingReset(LocalSearch):
 
         limit = 10
         count = 0
-            
+        self.value = float('-inf')
         while True:
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
@@ -125,17 +125,18 @@ class HillClimbingReset(LocalSearch):
             # Retornar si estamos en un optimo local 
             # (diferencia de valor objetivo no positiva)
             if diff[act] <= 0:
-                if count == limit:
+                count += 1
+                if self.value < value:
                     self.tour = actual
                     self.value = value
+                if count == limit:
                     end = time()
                     self.time = end-start
                     return
-
                 else:
                     actual = problem.random_reset()
                     value = problem.obj_val(actual)
-                    count += 1
+                    #count += 1
                     
             # Sino, nos movemos al sucesor
             else:
